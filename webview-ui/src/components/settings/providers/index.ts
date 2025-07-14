@@ -20,3 +20,4 @@ export { VSCodeLM } from "./VSCodeLM"
 export { XAI } from "./XAI"
 export { LiteLLM } from "./LiteLLM"
 export { Cerebras } from "./Cerebras" // kilocode_change
+export { QwenPlus } from "./QwenPlus"

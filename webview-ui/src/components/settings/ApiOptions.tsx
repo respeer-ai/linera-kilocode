@@ -26,6 +26,7 @@ import {
 	chutesDefaultModelId,
 	bedrockDefaultModelId,
 	vertexDefaultModelId,
+	qwenPlusDefaultModelId,
 } from "@roo-code/types"
 
 import { vscode } from "@src/utils/vscode"
@@ -68,6 +69,7 @@ import {
 	VSCodeLM,
 	XAI,
 	Cerebras, // kilocode_change
+	QwenPlus,
 } from "./providers"
 
 import { MODELS_BY_PROVIDER, PROVIDERS } from "./constants"
@@ -299,6 +301,7 @@ const ApiOptions = ({
 				lmstudio: { field: "lmStudioModelId" },
 				kilocode: { field: "kilocodeModel", default: "claude37" }, // kilocode_change
 				cerebras: { field: "cerebrasModelId", default: cerebrasDefaultModelId }, // kilocode_change
+				"qwen-plus": { field: "apiModelId", default: qwenPlusDefaultModelId },
 			}
 
 			const config = PROVIDER_MODEL_CONFIG[value]
@@ -590,6 +593,10 @@ const ApiOptions = ({
 					organizationAllowList={organizationAllowList}
 					modelValidationError={modelValidationError}
 				/>
+			)}
+
+			{selectedProvider === "qwen-plus" && (
+				<QwenPlus apiConfiguration={apiConfiguration} setApiConfigurationField={setApiConfigurationField} />
 			)}
 
 			{selectedProvider === "human-relay" && (
