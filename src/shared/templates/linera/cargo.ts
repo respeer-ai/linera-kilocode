@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-async-graphql = { version = "=7.0.17", default-features = false }
+async-graphql = { version = "=7.0.16", default-features = false }
 futures = "0.3.24"
 linera-sdk = { version = "0.14.1" }
 linera-views = { version = "0.14.1", default-features = false }
