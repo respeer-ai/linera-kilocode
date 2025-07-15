@@ -83,7 +83,6 @@ export const modes: readonly ModeConfig[] = [
 │   └── single_chain.rs
 └── web-frontend
     ├── package.json
-    ├── package-lock.json
     ├── public
     │   ├── favicon.ico
     │   └── index.html
@@ -125,7 +124,6 @@ export const modes: readonly ModeConfig[] = [
 │   └── single_chain.rs
 └── web-frontend
     ├── package.json
-    ├── package-lock.json
     ├── public
     │   ├── favicon.ico
     │   └── index.html
@@ -172,16 +170,153 @@ impl ServiceAbi for CounterAbi {
 \`\`\`
 
 📁 src/contract.rs (Template)
-Implements smart contract logic: instantiate, execute_operation, execute_message, store, etc.
+\`\`\`rust
+#![cfg_attr(target_arch = "wasm32", no_main)]
+
+mod state;
+
+use counter::CounterAbi;
+use linera_sdk::{
+    linera_base_types::WithContractAbi,
+    views::{RootView, View},
+    Contract, ContractRuntime,
+};
+
+use self::state::CounterState;
+
+pub struct CounterContract {
+    state: CounterState,
+    runtime: ContractRuntime<Self>,
+}
+
+linera_sdk::contract!(CounterContract);
+
+impl WithContractAbi for CounterContract {
+    type Abi = CounterAbi;
+}
+
+impl Contract for CounterContract {
+    type Message = ();
+    type InstantiationArgument = u64;
+    type Parameters = ();
+    type EventValue = ();
+
+    async fn load(runtime: ContractRuntime<Self>) -> Self {
+        let state = CounterState::load(runtime.root_view_storage_context())
+            .await
+            .expect("Failed to load state");
+        CounterContract { state, runtime }
+    }
+
+    async fn instantiate(&mut self, value: u64) {
+        self.runtime.application_parameters();
+        self.state.value.set(value);
+    }
+
+    async fn execute_operation(&mut self, operation: u64) -> u64 {
+        let new_value = self.state.value.get() + operation;
+        self.state.value.set(new_value);
+        new_value
+    }
+
+    async fn execute_message(&mut self, _message: ()) {
+        panic!("Counter application doesn't support any cross-chain messages");
+    }
+
+    async fn store(mut self) {
+        self.state.save().await.expect("Failed to save state");
+    }
+}
+\`\`\`
 
 📁 src/service.rs (Template)
-Provides GraphQL interface using async-graphql; typically includes a QueryRoot and MutationRoot.
+\`\`\`rust
+#![cfg_attr(target_arch = "wasm32", no_main)]
+
+mod state;
+
+use std::sync::Arc;
+
+use async_graphql::{EmptySubscription, Object, Request, Response, Schema};
+use linera_sdk::{linera_base_types::WithServiceAbi, views::View, Service, ServiceRuntime};
+
+use self::state::CounterState;
+
+pub struct CounterService {
+    state: CounterState,
+    runtime: Arc<ServiceRuntime<Self>>,
+}
+
+linera_sdk::service!(CounterService);
+
+impl WithServiceAbi for CounterService {
+    type Abi = counter::CounterAbi;
+}
+
+impl Service for CounterService {
+    type Parameters = ();
+
+    async fn new(runtime: ServiceRuntime<Self>) -> Self {
+        let state = CounterState::load(runtime.root_view_storage_context())
+            .await
+            .expect("Failed to load state");
+        CounterService {
+            state,
+            runtime: Arc::new(runtime),
+        }
+    }
+
+    async fn handle_query(&self, request: Request) -> Response {
+        let schema = Schema::build(
+            QueryRoot {
+                value: *self.state.value.get(),
+            },
+            MutationRoot {
+                runtime: self.runtime.clone(),
+            },
+            EmptySubscription,
+        )
+        .finish();
+        schema.execute(request).await
+    }
+}
+
+struct MutationRoot {
+    runtime: Arc<ServiceRuntime<CounterService>>,
+}
+
+#[Object]
+impl MutationRoot {
+    async fn increment(&self, value: u64) -> [u8; 0] {
+        self.runtime.schedule_operation(&value);
+        []
+    }
+}
+
+struct QueryRoot {
+    value: u64,
+}
+
+#[Object]
+impl QueryRoot {
+    async fn value(&self) -> &u64 {
+        &self.value
+    }
+}
+\`\`\`
 
 📁 src/state.rs (Template)
-Defines the contract state using RootView and WASM-safe types such as RegisterView.
+\`\`\`rust
+use linera_sdk::views::{linera_views, RegisterView, RootView, ViewStorageContext};
+
+#[derive(RootView)]
+#[view(context = ViewStorageContext)]
+pub struct CounterState {
+    pub value: RegisterView<u64>,
+}
+\`\`\`
 
 📁 Cargo.toml (Template)
-Includes dependencies, dev-dependencies, and binary targets:
 \`\`\`toml
 [package]
 name = "counter"
@@ -196,7 +331,7 @@ linera-views = { version = "0.14.1", default-features = false }
 serde_json = "1.0.93"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
-linera-sdk = { version = "0.14.1" , features = ["test", "wasmer"] }
+linera-sdk = { version = "0.14.1", features = ["test", "wasmer"] }
 tokio = { version = "1.25.0", features = ["rt", "sync"] }
 
 [dev-dependencies]
@@ -213,7 +348,6 @@ path = "src/service.rs"
 \`\`\`
 
 📁 tests/single_chain.rs (Template)
-Integration test for single-chain counter behavior using TestValidator:
 \`\`\`rust
 #[tokio::test(flavor = "multi_thread")]
 async fn single_chain_test() {
