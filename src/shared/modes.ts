@@ -23,7 +23,6 @@ import {
 	lineraStateTemplate,
 	lineraTestSingleChainTemplate,
 } from "./templates/linera"
-import { rustInstallCommand } from "./installation"
 
 export type Mode = string
 
@@ -139,7 +138,7 @@ Prefer using alloc, core, and data structures that are known to compile to WASM 
 📦 If any Rust file requires a new external crate, make sure to update Cargo.toml with the corresponding [dependencies] entry, including version and feature flags if needed.
 
 📥 If Rust needs to be installed:
-- On **Windows**, use the ${rustInstallCommand()} to download rustup-init.exe then execute
+- On **Windows**, use the https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe to download rustup-init.exe then execute
 - On **macOS** or **Linux**, run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 The following file templates are examples only. They are not meant to be copied as-is. When generating code, always adapt these templates to match the user's intent, functionality, and requirements.
