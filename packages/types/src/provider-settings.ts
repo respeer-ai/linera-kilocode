@@ -34,6 +34,7 @@ export const providerNames = [
 	"fireworks", // kilocode_change
 	"kilocode", // kilocode_change
 	"cerebras", // kilocode_change
+	"qwen-plus",
 ] as const
 
 export const providerNamesSchema = z.enum(providerNames)
@@ -242,6 +243,11 @@ const cerebrasSchema = baseProviderSettingsSchema.extend({
 })
 // kilocode_change end
 
+const qwenPlusSchema = apiModelIdProviderModelSchema.extend({
+	qwenPlusBaseUrl: z.string().optional(),
+	qwenPlusApiKey: z.string().optional(),
+})
+
 const defaultSchema = z.object({
 	apiProvider: z.undefined(),
 })
@@ -273,6 +279,7 @@ export const providerSettingsSchemaDiscriminated = z.discriminatedUnion("apiProv
 	kilocodeSchema.merge(z.object({ apiProvider: z.literal("kilocode") })), // kilocode_change
 	fireworksSchema.merge(z.object({ apiProvider: z.literal("fireworks") })), // kilocode_change
 	cerebrasSchema.merge(z.object({ apiProvider: z.literal("cerebras") })), // kilocode_change
+	qwenPlusSchema.merge(z.object({ apiProvider: z.literal("qwen-plus") })),
 	defaultSchema,
 ])
 
@@ -305,6 +312,7 @@ export const providerSettingsSchema = z.object({
 	...kilocodeSchema.shape, // kilocode_change
 	...fireworksSchema.shape, // kilocode_change
 	...cerebrasSchema.shape, // kilocode_change
+	...qwenPlusSchema.shape,
 })
 
 export type ProviderSettings = z.infer<typeof providerSettingsSchema>

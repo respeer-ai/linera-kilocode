@@ -159,6 +159,7 @@ export const SECRET_STATE_KEYS = [
 	"codeIndexQdrantApiKey",
 	"kilocodeToken", // kilocode_change
 	"codebaseIndexOpenAiCompatibleApiKey",
+	"qwenPlusApiKey",
 ] as const satisfies readonly (keyof ProviderSettings)[]
 export type SecretState = Pick<ProviderSettings, (typeof SECRET_STATE_KEYS)[number]>
 

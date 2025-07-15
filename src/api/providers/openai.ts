@@ -44,6 +44,7 @@ export class OpenAiHandler extends BaseProvider implements SingleCompletionHandl
 		const headers = {
 			...DEFAULT_HEADERS,
 			...(this.options.openAiHeaders || {}),
+			Authorization: `Bearer ${apiKey}`,
 		}
 
 		if (isAzureAiInference) {

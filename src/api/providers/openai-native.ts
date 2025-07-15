@@ -39,6 +39,7 @@ export class OpenAiNativeHandler extends BaseProvider implements SingleCompletio
 		metadata?: ApiHandlerCreateMessageMetadata,
 	): ApiStream {
 		const model = this.getModel()
+
 		let id: "o3-mini" | "o3" | "o4-mini" | undefined
 
 		if (model.id.startsWith("o3-mini")) {
