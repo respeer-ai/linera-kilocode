@@ -30,6 +30,7 @@ import {
 	LiteLLMHandler,
 	CerebrasHandler, // kilocode_change
 	ClaudeCodeHandler,
+	QwenPlusHandler,
 } from "./providers"
 // kilocode_change start
 import { FireworksHandler } from "./providers/fireworks"
@@ -65,6 +66,13 @@ export interface ApiHandler {
 	countTokens(content: Array<Anthropic.Messages.ContentBlockParam>): Promise<number>
 }
 
+/**
+ * Builds an API handler based on the specified provider configuration.
+ *
+ * @param configuration - Provider settings including the API provider type and options
+ * @returns An appropriate API handler instance for the specified provider
+ * @default AnthropicHandler - Returns Anthropic handler as fallback for unknown providers
+ */
 export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 	const { apiProvider, ...options } = configuration
 
@@ -129,6 +137,8 @@ export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 		case "cerebras":
 			return new CerebrasHandler(options)
 		// kilocode_change end
+		case "qwen-plus":
+			return new QwenPlusHandler(options)
 		default:
 			return new AnthropicHandler(options)
 	}
