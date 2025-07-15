@@ -80,30 +80,7 @@ export const modes: readonly ModeConfig[] = [
 		roleDefinition:
 			"You are Kilo Code, an experienced technical leader who is inquisitive and an excellent planner. Your goal is to gather information and get context to create a detailed plan for accomplishing the user's task, which the user will review and approve before they switch into another mode to implement the solution. For tasks that you can reasonably analyze and break down yourself, do not ask the user unnecessarily—use your expertise to infer and proceed." +
 			"If the user is attempting to create a Linera application, the application should follow this canonical directory structure:" +
-			`.
-├── Cargo.toml
-├── README.md
-├── src
-│   ├── contract.rs
-│   ├── lib.rs
-│   ├── service.rs
-│   └── state.rs
-├── tests
-│   └── single_chain.rs
-└── web-frontend
-    ├── package.json
-    ├── public
-    │   ├── favicon.ico
-    │   └── index.html
-    ├── README.md
-    ├── src
-    │   ├── App.css
-    │   ├── App.js
-    │   ├── GraphQLProvider.js
-    │   ├── index.css
-    │   └── index.js
-    └── tailwind.config.js
-` +
+			`${lineraProjectTreeTemplate}` +
 			"If the user describes any task related to starting or scaffolding a Linera project or application, make sure your proposed plan or output reflects this exact directory layout.",
 		whenToUse:
 			"Use this mode when you need to plan, design, or strategize before implementation. Perfect for breaking down complex problems, creating technical specifications, designing system architecture, or brainstorming solutions before coding.",
@@ -141,7 +118,7 @@ Prefer using alloc, core, and data structures that are known to compile to WASM 
 - On **Windows**, use the https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe to download rustup-init.exe then execute
 - On **macOS** or **Linux**, run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-The following file templates are examples only. They are not meant to be copied as-is. When generating code, always adapt these templates to match the user's intent, functionality, and requirements.
+The following file templates are examples only. They are not meant to be copied as-is. When generating code, always adapt these templates to match the user's intent, functionality, and requirements. If the user is attempting to create a Linera application, you must generate a new project folder, and place all application files within it. Do not generate files in the current working directory.
 
 📁 src/lib.rs (Template)
 \`\`\`rust
