@@ -118,34 +118,34 @@ Prefer using alloc, core, and data structures that are known to compile to WASM 
 - On **Windows**, use the https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe to download rustup-init.exe then execute
 - On **macOS** or **Linux**, run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-The following file templates are examples only. They are not meant to be copied as-is. When generating code, always adapt these templates to match the user's intent, functionality, and requirements. If the user is attempting to create a Linera application, you must generate a new project folder, and place all application files within it. Do not generate files in the current working directory.
+The following file templates are examples only. They are not meant to be copied as-is. When generating code, always adapt these templates to match the user's intent, functionality, and requirements.
 
-📁 src/lib.rs (Template)
+📁 project_name/src/lib.rs (Template)
 \`\`\`rust
 ${lineraLibTemplate}
 \`\`\`
 
-📁 src/contract.rs (Template)
+📁 project_name/src/contract.rs (Template)
 \`\`\`rust
 ${lineraContractTemplate}
 \`\`\`
 
-📁 src/service.rs (Template)
+📁 project_name/src/service.rs (Template)
 \`\`\`rust
 ${lineraServiceTemplate}
 \`\`\`
 
-📁 src/state.rs (Template)
+📁 project_name/src/state.rs (Template)
 \`\`\`rust
 ${lineraStateTemplate}
 \`\`\`
 
-📁 Cargo.toml (Template)
+📁 project_name/Cargo.toml (Template)
 \`\`\`toml
 ${lineraCargoTemplate}
 \`\`\`
 
-📁 tests/single_chain.rs (Template)
+📁 project_name/tests/single_chain.rs (Template)
 \`\`\`rust
 ${lineraTestSingleChainTemplate}
 \`\`\`
