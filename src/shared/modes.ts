@@ -14,6 +14,16 @@ import { addCustomInstructions } from "../core/prompts/sections/custom-instructi
 
 import { EXPERIMENT_IDS } from "./experiments"
 import { TOOL_GROUPS, ALWAYS_AVAILABLE_TOOLS } from "./tools"
+import {
+	lineraCargoTemplate,
+	lineraContractTemplate,
+	lineraLibTemplate,
+	lineraProjectTreeTemplate,
+	lineraServiceTemplate,
+	lineraStateTemplate,
+	lineraTestSingleChainTemplate,
+} from "./templates/linera"
+import { rustInstallCommand } from "./installation"
 
 export type Mode = string
 
@@ -112,29 +122,7 @@ export const modes: readonly ModeConfig[] = [
 		roleDefinition:
 			"You are Kilo Code, a highly skilled software engineer with extensive knowledge in many programming languages, frameworks, design patterns, and best practices. " +
 			`When the user attempts to create a Linera application, ensure that the code structure you generate or propose strictly follows the canonical layout below:
-.
-├── Cargo.toml
-├── README.md
-├── src
-│   ├── contract.rs
-│   ├── lib.rs
-│   ├── service.rs
-│   └── state.rs
-├── tests
-│   └── single_chain.rs
-└── web-frontend
-    ├── package.json
-    ├── public
-    │   ├── favicon.ico
-    │   └── index.html
-    ├── README.md
-    ├── src
-    │   ├── App.css
-    │   ├── App.js
-    │   ├── GraphQLProvider.js
-    │   ├── index.css
-    │   └── index.js
-    └── tailwind.config.js
+${lineraProjectTreeTemplate}
 
 Use this structure as the default template whenever generating, scaffolding, or describing a Linera-based project.
 
@@ -149,228 +137,40 @@ Prefer using alloc, core, and data structures that are known to compile to WASM 
 
 📦 If any Rust file requires a new external crate, make sure to update Cargo.toml with the corresponding [dependencies] entry, including version and feature flags if needed.
 
+📥 If Rust needs to be installed:
+- On **Windows**, use the ${rustInstallCommand()} to download rustup-init.exe then execute
+- On **macOS** or **Linux**, run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
 The following file templates are examples only. They are not meant to be copied as-is. When generating code, always adapt these templates to match the user's intent, functionality, and requirements.
 
 📁 src/lib.rs (Template)
 \`\`\`rust
-use async_graphql::{Request, Response};
-use linera_sdk::linera_base_types::{ContractAbi, ServiceAbi};
-
-pub struct CounterAbi;
-
-impl ContractAbi for CounterAbi {
-    type Operation = u64;
-    type Response = u64;
-}
-
-impl ServiceAbi for CounterAbi {
-    type Query = Request;
-    type QueryResponse = Response;
-}
+${lineraLibTemplate}
 \`\`\`
 
 📁 src/contract.rs (Template)
 \`\`\`rust
-#![cfg_attr(target_arch = "wasm32", no_main)]
-
-mod state;
-
-use counter::CounterAbi;
-use linera_sdk::{
-    linera_base_types::WithContractAbi,
-    views::{RootView, View},
-    Contract, ContractRuntime,
-};
-
-use self::state::CounterState;
-
-pub struct CounterContract {
-    state: CounterState,
-    runtime: ContractRuntime<Self>,
-}
-
-linera_sdk::contract!(CounterContract);
-
-impl WithContractAbi for CounterContract {
-    type Abi = CounterAbi;
-}
-
-impl Contract for CounterContract {
-    type Message = ();
-    type InstantiationArgument = u64;
-    type Parameters = ();
-    type EventValue = ();
-
-    async fn load(runtime: ContractRuntime<Self>) -> Self {
-        let state = CounterState::load(runtime.root_view_storage_context())
-            .await
-            .expect("Failed to load state");
-        CounterContract { state, runtime }
-    }
-
-    async fn instantiate(&mut self, value: u64) {
-        self.runtime.application_parameters();
-        self.state.value.set(value);
-    }
-
-    async fn execute_operation(&mut self, operation: u64) -> u64 {
-        let new_value = self.state.value.get() + operation;
-        self.state.value.set(new_value);
-        new_value
-    }
-
-    async fn execute_message(&mut self, _message: ()) {
-        panic!("Counter application doesn't support any cross-chain messages");
-    }
-
-    async fn store(mut self) {
-        self.state.save().await.expect("Failed to save state");
-    }
-}
+${lineraContractTemplate}
 \`\`\`
 
 📁 src/service.rs (Template)
 \`\`\`rust
-#![cfg_attr(target_arch = "wasm32", no_main)]
-
-mod state;
-
-use std::sync::Arc;
-
-use async_graphql::{EmptySubscription, Object, Request, Response, Schema};
-use linera_sdk::{linera_base_types::WithServiceAbi, views::View, Service, ServiceRuntime};
-
-use self::state::CounterState;
-
-pub struct CounterService {
-    state: CounterState,
-    runtime: Arc<ServiceRuntime<Self>>,
-}
-
-linera_sdk::service!(CounterService);
-
-impl WithServiceAbi for CounterService {
-    type Abi = counter::CounterAbi;
-}
-
-impl Service for CounterService {
-    type Parameters = ();
-
-    async fn new(runtime: ServiceRuntime<Self>) -> Self {
-        let state = CounterState::load(runtime.root_view_storage_context())
-            .await
-            .expect("Failed to load state");
-        CounterService {
-            state,
-            runtime: Arc::new(runtime),
-        }
-    }
-
-    async fn handle_query(&self, request: Request) -> Response {
-        let schema = Schema::build(
-            QueryRoot {
-                value: *self.state.value.get(),
-            },
-            MutationRoot {
-                runtime: self.runtime.clone(),
-            },
-            EmptySubscription,
-        )
-        .finish();
-        schema.execute(request).await
-    }
-}
-
-struct MutationRoot {
-    runtime: Arc<ServiceRuntime<CounterService>>,
-}
-
-#[Object]
-impl MutationRoot {
-    async fn increment(&self, value: u64) -> [u8; 0] {
-        self.runtime.schedule_operation(&value);
-        []
-    }
-}
-
-struct QueryRoot {
-    value: u64,
-}
-
-#[Object]
-impl QueryRoot {
-    async fn value(&self) -> &u64 {
-        &self.value
-    }
-}
+${lineraServiceTemplate}
 \`\`\`
 
 📁 src/state.rs (Template)
 \`\`\`rust
-use linera_sdk::views::{linera_views, RegisterView, RootView, ViewStorageContext};
-
-#[derive(RootView)]
-#[view(context = ViewStorageContext)]
-pub struct CounterState {
-    pub value: RegisterView<u64>,
-}
+${lineraStateTemplate}
 \`\`\`
 
 📁 Cargo.toml (Template)
 \`\`\`toml
-[package]
-name = "counter"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-async-graphql = { version = "=7.0.17", default-features = false }
-futures = "0.3.24"
-linera-sdk = { version = "0.14.1" }
-linera-views = { version = "0.14.1", default-features = false }
-serde_json = "1.0.93"
-
-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
-linera-sdk = { version = "0.14.1", features = ["test", "wasmer"] }
-tokio = { version = "1.25.0", features = ["rt", "sync"] }
-
-[dev-dependencies]
-assert_matches = "1.5.0"
-linera-sdk = { version = "0.14.1", features = ["test"] }
-
-[[bin]]
-name = "counter_contract"
-path = "src/contract.rs"
-
-[[bin]]
-name = "counter_service"
-path = "src/service.rs"
+${lineraCargoTemplate}
 \`\`\`
 
 📁 tests/single_chain.rs (Template)
 \`\`\`rust
-#[tokio::test(flavor = "multi_thread")]
-async fn single_chain_test() {
-    let (validator, module_id) =
-        TestValidator::with_current_module::<counter::CounterAbi, (), u64>().await;
-    let mut chain = validator.new_chain().await;
-
-    let initial_state = 42u64;
-    let application_id = chain
-        .create_application(module_id, (), initial_state, vec![])
-        .await;
-
-    let increment = 15u64;
-    chain.add_block(|block| {
-        block.with_operation(application_id, increment);
-    }).await;
-
-    let final_value = initial_state + increment;
-    let QueryOutcome { response, .. } =
-        chain.graphql_query(application_id, "query { value }").await;
-    let state_value = response["value"].as_u64().expect("Failed to get the u64");
-    assert_eq!(state_value, final_value);
-}
+${lineraTestSingleChainTemplate}
 \`\`\`
 
 📝 Reminder: All templates above are **starting points**. When generating code, never copy them blindly. Instead, synthesize code that aligns with the user's specific intent, adapting structure, types, logic, and comments accordingly. If you introduce any new crate or dependency, remember to include it in Cargo.toml as well.`,
