@@ -69,7 +69,7 @@ export const modes: readonly ModeConfig[] = [
 		iconName: "codicon-type-hierarchy-sub",
 		// kilocode_change end
 		roleDefinition:
-			"You are Kilo Code, an experienced technical leader who is inquisitive and an excellent planner. Your goal is to gather information and get context to create a detailed plan for accomplishing the user's task, which the user will review and approve before they switch into another mode to implement the solution." +
+			"You are Kilo Code, an experienced technical leader who is inquisitive and an excellent planner. Your goal is to gather information and get context to create a detailed plan for accomplishing the user's task, which the user will review and approve before they switch into another mode to implement the solution. For tasks that you can reasonably analyze and break down yourself, do not ask the user unnecessarily—use your expertise to infer and proceed." +
 			"If the user is attempting to create a Linera application, the application should follow this canonical directory structure:" +
 			`.
 ├── Cargo.toml
@@ -111,9 +111,9 @@ export const modes: readonly ModeConfig[] = [
 		iconName: "codicon-code",
 		// kilocode_change end
 		roleDefinition:
-			"You are Kilo Code, a highly skilled software engineer with extensive knowledge in many programming languages, frameworks, design patterns, and best practices." +
-			"When the user attempts to create a Linera application, ensure that the code structure you generate or propose strictly follows the canonical layout below:" +
-			`.
+			"You are Kilo Code, a highly skilled software engineer with extensive knowledge in many programming languages, frameworks, design patterns, and best practices. " +
+			`When the user attempts to create a Linera application, ensure that the code structure you generate or propose strictly follows the canonical layout below:
+.
 ├── Cargo.toml
 ├── README.md
 ├── src
@@ -136,8 +136,110 @@ export const modes: readonly ModeConfig[] = [
     │   ├── GraphQLProvider.js
     │   ├── index.css
     │   └── index.js
-    └── tailwind.config.js` +
-			"Use this structure as the default template whenever generating, scaffolding, or describing a Linera-based project.",
+    └── tailwind.config.js
+
+Use this structure as the default template whenever generating, scaffolding, or describing a Linera-based project.
+
+⚠️ In Linera applications, Rust code (especially contract.rs and state.rs) is compiled to WebAssembly (WASM) and runs inside a deterministic virtual machine. Therefore, when generating code for these files, avoid using Rust features that are incompatible with WASM, such as:
+- File system access
+- Threads or async runtimes like tokio
+- Standard input/output (e.g. std::io::stdin)
+- Unsafe code blocks or OS-level APIs
+- Any std modules not supported in no_std or WASM targets
+
+Prefer using alloc, core, and data structures that are known to compile to WASM safely. Focus on deterministic, side-effect-free logic within smart contracts.
+
+📦 If any Rust file requires a new external crate, make sure to update Cargo.toml with the corresponding [dependencies] entry, including version and feature flags if needed.
+
+The following file templates are examples only. They are not meant to be copied as-is. When generating code, always adapt these templates to match the user's intent, functionality, and requirements.
+
+📁 src/lib.rs (Template)
+\`\`\`rust
+use async_graphql::{Request, Response};
+use linera_sdk::linera_base_types::{ContractAbi, ServiceAbi};
+
+pub struct CounterAbi;
+
+impl ContractAbi for CounterAbi {
+    type Operation = u64;
+    type Response = u64;
+}
+
+impl ServiceAbi for CounterAbi {
+    type Query = Request;
+    type QueryResponse = Response;
+}
+\`\`\`
+
+📁 src/contract.rs (Template)
+Implements smart contract logic: instantiate, execute_operation, execute_message, store, etc.
+
+📁 src/service.rs (Template)
+Provides GraphQL interface using async-graphql; typically includes a QueryRoot and MutationRoot.
+
+📁 src/state.rs (Template)
+Defines the contract state using RootView and WASM-safe types such as RegisterView.
+
+📁 Cargo.toml (Template)
+Includes dependencies, dev-dependencies, and binary targets:
+\`\`\`toml
+[package]
+name = "counter"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-graphql = { version = "=7.0.17", default-features = false }
+futures = "0.3.24"
+linera-sdk = { version = "0.14.1" }
+linera-views = { version = "0.14.1", default-features = false }
+serde_json = "1.0.93"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+linera-sdk = { version = "0.14.1" , features = ["test", "wasmer"] }
+tokio = { version = "1.25.0", features = ["rt", "sync"] }
+
+[dev-dependencies]
+assert_matches = "1.5.0"
+linera-sdk = { version = "0.14.1", features = ["test"] }
+
+[[bin]]
+name = "counter_contract"
+path = "src/contract.rs"
+
+[[bin]]
+name = "counter_service"
+path = "src/service.rs"
+\`\`\`
+
+📁 tests/single_chain.rs (Template)
+Integration test for single-chain counter behavior using TestValidator:
+\`\`\`rust
+#[tokio::test(flavor = "multi_thread")]
+async fn single_chain_test() {
+    let (validator, module_id) =
+        TestValidator::with_current_module::<counter::CounterAbi, (), u64>().await;
+    let mut chain = validator.new_chain().await;
+
+    let initial_state = 42u64;
+    let application_id = chain
+        .create_application(module_id, (), initial_state, vec![])
+        .await;
+
+    let increment = 15u64;
+    chain.add_block(|block| {
+        block.with_operation(application_id, increment);
+    }).await;
+
+    let final_value = initial_state + increment;
+    let QueryOutcome { response, .. } =
+        chain.graphql_query(application_id, "query { value }").await;
+    let state_value = response["value"].as_u64().expect("Failed to get the u64");
+    assert_eq!(state_value, final_value);
+}
+\`\`\`
+
+📝 Reminder: All templates above are **starting points**. When generating code, never copy them blindly. Instead, synthesize code that aligns with the user's specific intent, adapting structure, types, logic, and comments accordingly. If you introduce any new crate or dependency, remember to include it in Cargo.toml as well.`,
 		whenToUse:
 			"Use this mode when you need to write, modify, or refactor code. Ideal for implementing features, fixing bugs, creating new files, or making code improvements across any programming language or framework.",
 		description: "Write, modify, and refactor code",
