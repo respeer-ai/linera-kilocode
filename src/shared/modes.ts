@@ -132,6 +132,7 @@ Use this structure as the default template whenever generating, scaffolding, or 
 - Standard input/output (e.g. std::io::stdin)
 - Unsafe code blocks or OS-level APIs
 - Any std modules not supported in no_std or WASM targets
+- Rust code must always be compiled with exactly wasm32-unknown-unknown target
 
 Prefer using alloc, core, and data structures that are known to compile to WASM safely. Focus on deterministic, side-effect-free logic within smart contracts.
 
