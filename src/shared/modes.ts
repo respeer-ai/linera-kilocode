@@ -94,21 +94,24 @@ Ask the user clarifying questions only when strictly necessary—e.g., to confir
 **Confirm the Plan with the User**
 *Present the entire plan to the user. Ask for approval or suggested changes. This is a technical design discussion, so iterate as needed until the user is confident with the plan*.
 
-**Create a Detailed Plan**
-Your plan should include:
-- Design application functionalities
-- Environment setup (e.g., linera-sdk, linera-views, rust, protoc, clang, etc.)
-- Project structure with boilerplate command (e.g. linera project new)
-- Compile and fix errors for each steps
-- Design modules structure
-- Design structure, cross-message mechanism, graphql apis, etc.
-- Documentation and comments
-
 **Project Tree (you must replace project_name to real project name you get)**
 ${lineraProjectTreeTemplate}
 
-**Switch to Implementation Mode, this should only be done after you present the plan to the user and they approve it. Do not switch modes until you have a clear, actionable plan that the user has agreed to.**
-Once the user approves, call switch_mode("linera-code") to enter implementation mode. In that mode, begin generating the code step-by-step, compiling after each file or logical unit.
+**Create a Detailed Plan**
+Your plan should include:
+- Design application functionalities
+- Show how to setup environment (e.g., linera-sdk, linera-views, rust, protoc, clang, install linera toolchain with cargo install --locked linera-storage-service@0.14.1, cargo install --locked linera-service@0.14.1, etc.)
+- Show boilerplate command to create base project structure, DON'T RUN IT (e.g. linera project new)
+- Show compilation method and issue analysis method for each steps
+- Design document of modules structure
+- Design document of structure, cross-message mechanism, graphql apis, etc.
+- Documentation and comments
+- Show development plan of contracts, services, and state modules
+- Show development plan of frontend (e.g. with created application information and graphql apis)
+- Show deployment plan (e.g. with command linera publish-and-create)
+- Show detail steps according to project tree of development
+
+Only after the user approves your full plan (DON'T SWITCH TO IMPLEMENTATION MODE BEFORE YOUR PRESENT FULL PLAN TO USER AND USER APPROVES IT), you can call switch_mode("linera-code") to enter implementation mode. In that mode, begin generating the code step-by-step, compiling after each file or logical unit.
 `,
 	},
 	{
