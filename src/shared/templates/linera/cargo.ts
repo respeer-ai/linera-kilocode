@@ -1,4 +1,5 @@
-export const lineraCargoTemplate = `[package]
+export const lineraCargoTemplate = `
+[package]
 name = "counter"
 version = "0.1.0"
 edition = "2021"
@@ -9,6 +10,7 @@ futures = "0.3.24"
 linera-sdk = { version = "0.14.1" }
 linera-views = { version = "0.14.1", default-features = false }
 serde_json = "1.0.93"
+serde = { version = "1.0.152", features = ["derive"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 linera-sdk = { version = "0.14.1", features = ["test", "wasmer"] }
@@ -24,4 +26,5 @@ path = "src/contract.rs"
 
 [[bin]]
 name = "counter_service"
-path = "src/service.rs"`
+path = "src/service.rs"
+`

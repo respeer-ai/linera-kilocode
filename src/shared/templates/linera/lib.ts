@@ -1,4 +1,5 @@
-export const lineraLibTemplate = `// Copyright (c) Zefchain Labs, Inc.
+export const lineraLibTemplate = `
+// Copyright (c) Zefchain Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
 /*! ABI of the Counter Example Application */
@@ -20,4 +21,5 @@ impl ServiceAbi for CounterAbi {
     type Query = Request;
     type QueryResponse = Response;
 }
-// ANCHOR_END: service_abi`
+// ANCHOR_END: service_abi
+`
