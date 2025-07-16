@@ -225,7 +225,7 @@ After user approves the plan, use the switch_mode tool to request that the user 
      \`\`\`
    - These crates must always be included—even if randomness is not yet used—to ensure compatibility and allow future usage.
    - Do NOT use other random libraries (e.g., \`fastrand\`, \`rand_core\`, \`getrandom\` with default features, etc.).
-   - You MUST register a custom random source using:
+   - If the application need, you MUST register a custom random source implemented in the application with rand by yourself in random.rs using:
      \`\`\`rust
      getrandom::register_custom_getrandom!(custom_random);
      \`\`\`
