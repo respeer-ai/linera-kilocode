@@ -91,14 +91,10 @@ Begin by collecting all relevant context. Use tools like read_file or search_fil
 Ask Only Necessary Questions
 Ask the user clarifying questions only when strictly necessary—e.g., to confirm cross-chain behavior, session usage, or permission rules—not for information you can infer from context.
 
-**Confirm the Plan with the User**
-*Present the entire plan to the user. Ask for approval or suggested changes. This is a technical design discussion, so iterate as needed until the user is confident with the plan*.
-
 **Project Tree (you must replace project_name to real project name you get)**
 ${lineraProjectTreeTemplate}
 
 **Create a Detailed Plan**
-Your plan should include:
 - Design application functionalities
 - Show how to setup environment (e.g., linera-sdk, linera-views, rust, protoc, clang, install linera toolchain with cargo install --locked linera-storage-service@0.14.1, cargo install --locked linera-service@0.14.1, etc.)
 - Show boilerplate command to create base project structure, DON'T RUN IT (e.g. linera project new)
@@ -111,7 +107,12 @@ Your plan should include:
 - Show deployment plan (e.g. with command linera publish-and-create)
 - Show detail steps according to project tree of development
 
-Only after the user approves your full plan (DON'T SWITCH TO IMPLEMENTATION MODE BEFORE YOUR PRESENT FULL PLAN TO USER AND USER APPROVES IT), you can call switch_mode("linera-code") to enter implementation mode. In that mode, begin generating the code step-by-step, compiling after each file or logical unit.
+YOU MUST RETURN FULL PATH OF THE SOURCE FILE: <project_name>/src/contract.rs is CORRECT, src/contract.rs is INCORRECT, <project_name>/Cargo.toml is CORRECT, Cargo.toml is INCORRECT.
+
+**Confirm the Plan with the User**
+*Present the entire plan to the user. Ask for approval or suggested changes. This is a technical design discussion, so iterate as needed until the user is confident with the plan*.
+
+After user approves the plan, use the switch_mode tool to request that the user switch to another mode to implement the solution..
 `,
 	},
 	{
@@ -126,6 +127,95 @@ Only after the user approves your full plan (DON'T SWITCH TO IMPLEMENTATION MODE
 			"Use this mode when you need to write, modify, or refactor code. Ideal for implementing features, fixing bugs, creating new files, or making code improvements across any programming language or framework.",
 		description: "Write, modify, and refactor code",
 		groups: ["read", "edit", "browser", "command", "mcp"],
+		customInstructions: `You are working in a Linera application development environment. The user is building a Rust-based decentralized application (dApp) using the linera-sdk and the Linera protocol. Follow these constraints strictly:
+
+1. **Toolchain Installation**
+
+   - First, ensure the Rust toolchain is installed with the \`wasm32-unknown-unknown\` target:
+     \`\`\`bash
+     rustup target add wasm32-unknown-unknown
+     \`\`\`
+
+   - If Linera CLI tools are not yet installed, install them using:
+     \`\`\`bash
+     cargo install --locked linera-storage-service --version 0.14.1
+     cargo install --locked linera-service --version 0.14.1
+     \`\`\`
+
+   - If your system does not have **LLVM**, it is required for building Rust to WASM:
+     - On **Windows**, download the [LLVM installer (.exe)](https://github.com/llvm/llvm-project/releases) and run it to install.
+     - On **macOS**, use Homebrew: \`brew install llvm\`
+     - On **Linux**, use your package manager: \`sudo apt install llvm\` or equivalent.
+     - Ensure LLVM binaries are available in your system \`PATH\`. You can verify with:
+       \`\`\`bash
+       llvm-config --version
+       \`\`\`
+
+   - Install Protocol Buffers (\`protoc\`, required by Linera backend services):
+     - **Windows/macOS/Linux**:
+       - Download from: https://github.com/protocolbuffers/protobuf/releases
+     - Verify with:
+       \`\`\`bash
+       protoc --version
+       \`\`\`
+
+2. **Project Initialization**
+
+   - Always create a new Linera application using:
+     \`\`\`bash
+     linera project new <project_name>
+     \`\`\`
+   - Never manually scaffold the structure unless modifying an existing project.
+
+3. **Rust code must be compiled with wasm32-unknown-unknown**
+
+   - Use target \`wasm32-unknown-unknown\`
+
+4. **Project Structure**
+
+   - ${lineraProjectTreeTemplate}
+
+5. **State Management**
+
+   - Use \`RegisterView<T>\`, \`MapView<K, V>\`, \`VecView<T>\`, etc. in linera-views crate
+   - Learn linera-views and linera-sdk crates to know how to use them in your code
+
+6. **Async Traits and Context**
+
+   - Use \`#[async_trait]\` for \`Contract\` and \`Service\`
+   - Always access state through provided \`runtime\` objects
+
+7. **Cross-Chain Behavior**
+
+   - Use \`runtime.send_message(...)\`
+
+8. **Standard Library Restrictions**
+
+   - Do not use any lib which is not work in wasm32-unknown-unknown target
+
+9. **Code Output Rules**
+
+   - Never generate all files at once; follow step-by-step approach
+   - Output code in Markdown blocks only
+   - No extra commentary unless requested
+
+10. **Post-Deployment Handling**
+
+   - Always capture and preserve the \`ApplicationId\` from \`linera publish-and-create\`
+   - Indicate that this ID will be used in front-end and chain calls
+
+11. **Front-end Integration**
+
+   - All front-end code (e.g., React/Next.js/Vue) must interact with the Linera GraphQL API
+   - Use GraphQL queries to:
+     - Fetch application state (via service interface)
+     - Submit operations (via mutation)
+     - Monitor chain state and message delivery
+   - The GraphQL endpoint is usually exposed by the local node or the Linera service proxy
+   - You must structure queries to match the service response format defined in \`service.rs\`
+
+YOU MUST RETURN FULL PATH OF THE SOURCE FILE: <project_name>/src/contract.rs is CORRECT, src/contract.rs is INCORRECT, <project_name>/Cargo.toml is CORRECT, Cargo.toml is INCORRECT.
+`,
 	},
 	{
 		slug: "architect",
