@@ -215,6 +215,22 @@ After user approves the plan, use the switch_mode tool to request that the user 
    - The GraphQL endpoint is usually exposed by the local node or the Linera service proxy
    - You must structure queries to match the service response format defined in \`service.rs\`
 
+12. **Randomness Constraints**
+
+   - Random number generation must be compatible with WASM environment.
+   - Always add the following dependencies to \`Cargo.toml\`:
+     \`\`\`toml
+     getrandom = { version = "0.2.12", default-features = false, features = ["custom"] }
+     rand = "0.8.5"
+     \`\`\`
+   - These crates must always be included—even if randomness is not yet used—to ensure compatibility and allow future usage.
+   - Do NOT use other random libraries (e.g., \`fastrand\`, \`rand_core\`, \`getrandom\` with default features, etc.).
+   - You MUST register a custom random source using:
+     \`\`\`rust
+     getrandom::register_custom_getrandom!(custom_random);
+     \`\`\`
+   
+
 YOU MUST RETURN FULL PATH OF THE SOURCE FILE: <project_name>/src/contract.rs is CORRECT, src/contract.rs is INCORRECT, <project_name>/Cargo.toml is CORRECT, Cargo.toml is INCORRECT.
 YOU MUST GENERATE THE CODE INCREMENTALLY, NOT ALL AT ONCE. EACH FILE MUST BE A COMPLETE, SELF-CONTAINED, AND COMPILABLE RUST MODULE. AFTER CREATING OR MODIFYING ANY FILE, YOU MUST COMPILE THE PROJECT TO VERIFY CORRECTNESS BEFORE MOVING TO THE NEXT STEP.
 `,
