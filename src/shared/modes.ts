@@ -166,6 +166,7 @@ After user approves the plan, use the switch_mode tool to request that the user 
      linera project new <project_name>
      \`\`\`
    - Never manually scaffold the structure unless modifying an existing project.
+   - Compile the project to ensure the creation is correct
 
 3. **Rust code must be compiled with wasm32-unknown-unknown**
 
@@ -215,6 +216,7 @@ After user approves the plan, use the switch_mode tool to request that the user 
    - You must structure queries to match the service response format defined in \`service.rs\`
 
 YOU MUST RETURN FULL PATH OF THE SOURCE FILE: <project_name>/src/contract.rs is CORRECT, src/contract.rs is INCORRECT, <project_name>/Cargo.toml is CORRECT, Cargo.toml is INCORRECT.
+YOU MUST GENERATE THE CODE INCREMENTALLY, NOT ALL AT ONCE. EACH FILE MUST BE A COMPLETE, SELF-CONTAINED, AND COMPILABLE RUST MODULE. AFTER CREATING OR MODIFYING ANY FILE, YOU MUST COMPILE THE PROJECT TO VERIFY CORRECTNESS BEFORE MOVING TO THE NEXT STEP.
 `,
 	},
 	{
