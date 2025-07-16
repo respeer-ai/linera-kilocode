@@ -1,0 +1,7 @@
+export const lineraToolChainsTemplate = `
+[toolchain]
+channel = "1.85.0"
+components = [ "clippy", "rustfmt", "rust-src" ]
+targets = [ "wasm32-unknown-unknown" ]
+profile = "minimal"
+`

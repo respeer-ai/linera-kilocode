@@ -1,4 +1,5 @@
-export const lineraServiceTemplate = `// Copyright (c) Zefchain Labs, Inc.
+export const lineraServiceTemplate = `
+// Copyright (c) Zefchain Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
 #![cfg_attr(target_arch = "wasm32", no_main)]
@@ -118,4 +119,5 @@ mod tests {
 
         assert_eq!(response, expected)
     }
-}`
+}
+`

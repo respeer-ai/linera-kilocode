@@ -1,4 +1,5 @@
-export const lineraTestSingleChainTemplate = `// Copyright (c) Zefchain Labs, Inc.
+export const lineraTestSingleChainTemplate = `
+// Copyright (c) Zefchain Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
 //! Integration tests for the Counter application.
@@ -36,4 +37,5 @@ async fn single_chain_test() {
     let state_value = response["value"].as_u64().expect("Failed to get the u64");
     assert_eq!(state_value, final_value);
 }
-// ANCHOR_END: counter_integration_test`
+// ANCHOR_END: counter_integration_test
+`
