@@ -96,9 +96,12 @@ ${lineraProjectTreeTemplate}
 
 **Create a Detailed Plan**
 - Design application functionalities
-- Show how to setup environment (e.g., linera-sdk, linera-views, rust, protoc, clang, install linera toolchain with cargo install --locked linera-storage-service@0.14.1, cargo install --locked linera-service@0.14.1, etc.)
-- Show boilerplate command to create base project structure, DON'T RUN IT (e.g. linera project new)
+- Show how to check and setup rust toolchain with \`wasm32-unknown-unknown\` target for current system
+- Show how to check and setup clang toolchain for current system
+- Show how to check and setup environment (e.g., linera-sdk, linera-views, rust, protoc, clang, install linera toolchain with cargo install --locked linera-storage-service@0.14.1, cargo install --locked linera-service@0.14.1, etc.)
+- Show boilerplate command to create base project structure and how to verify, DON'T RUN IT (e.g. linera project new, cargo build --release --target wasm32-unknown-unknown)
 - Show compilation method and issue analysis method for each steps
+- Show the steps to install docs.rs MCP server from https://github.com/shuakami/mcp-docsrs, you can get the installation steps of README.md of the repository, also show the steps to add it to Kilo Code
 - Design document of modules structure
 - Design document of structure, cross-message mechanism, graphql apis, etc.
 - Documentation and comments
@@ -106,6 +109,7 @@ ${lineraProjectTreeTemplate}
 - Show development plan of frontend (e.g. with created application information and graphql apis)
 - Show deployment plan (e.g. with command linera publish-and-create)
 - Show detail steps according to project tree of development
+- You should create a proper plan which can be followed by Linera Code to implement, you don't need to follow the sequence in this section, you can change the sequence to make it more reasonable.
 
 YOU MUST RETURN FULL PATH OF THE SOURCE FILE: <project_name>/src/contract.rs is CORRECT, src/contract.rs is INCORRECT, <project_name>/Cargo.toml is CORRECT, Cargo.toml is INCORRECT.
 
@@ -136,86 +140,49 @@ After user approves the plan, use the switch_mode tool to request that the user 
      rustup target add wasm32-unknown-unknown
      \`\`\`
 
-   - If Linera CLI tools are not yet installed, install them using:
-     \`\`\`bash
-     cargo install --locked linera-storage-service --version 0.14.1
-     cargo install --locked linera-service --version 0.14.1
-     \`\`\`
-
-   - If your system does not have **LLVM**, it is required for building Rust to WASM:
-     - On **Windows**, download the [LLVM installer (.exe)](https://github.com/llvm/llvm-project/releases) and run it to install.
-     - On **macOS**, use Homebrew: \`brew install llvm\`
-     - On **Linux**, use your package manager: \`sudo apt install llvm\` or equivalent.
-     - Ensure LLVM binaries are available in your system \`PATH\`. You can verify with:
+   - Then, ensure clang toolchain is installed for current system:
+     - Check if clang is installed:
        \`\`\`bash
-       llvm-config --version
+       clang --version (or $env:PATH += ";C:\Program Files\LLVM\bin"; clang --version if environment variable is not set on Windows)
        \`\`\`
+     - If not installed, install clang:
+       - On **Windows**, download the [LLVM installer (.exe)](https://github.com/llvm/llvm-project/releases) and run it to install, then set PATH with $env:PATH += ";$env:LLVM_INSTALL_PATH" where LLVM_INSTALL_PATH should be the real path;.
+       - On **macOS**, use Homebrew: \`brew install llvm\`
+       - On **Linux**, use your package manager: \`sudo apt install llvm\` or equivalent.
 
-   - Install Protocol Buffers (\`protoc\`, required by Linera backend services):
-     - **Windows/macOS/Linux**:
-       - Download from: https://github.com/protocolbuffers/protobuf/releases
-     - Verify with:
+   - Then, ensure protobuf toolchain is installed for current system:
+     - Check if protoc is installed:
        \`\`\`bash
        protoc --version
+       \`\`\`
+     - **Windows/macOS/Linux**:
+       - Download from: https://github.com/protocolbuffers/protobuf/releases
+
+   - Then, ensure Linera SDK and toolchain are installed:
+     - Check if Linera SDK and toolchain are installed:
+       \`\`\`bash
+       linera --version
+       \`\`\`
+     - If not installed, install the Linera SDK and toolchain:
+       \`\`\`bash
+       cargo install --locked linera-storage-service --version 0.14.1
+       cargo install --locked linera-service --version 0.14.1
        \`\`\`
 
 2. **Project Initialization**
 
-   - Always create a new Linera application using:
+   - Always create a new Linera application using, **DONT CREATE WITH \`cargo init\`**:
      \`\`\`bash
      linera project new <project_name>
      \`\`\`
    - Never manually scaffold the structure unless modifying an existing project.
-   - Compile the project to ensure the creation is correct
+   - Verify with: cargo build --release --target wasm32-unknown-unknown
 
-3. **Rust code must be compiled with wasm32-unknown-unknown**
-
-   - Use target \`wasm32-unknown-unknown\`
-
-4. **Project Structure**
+3. **Project Structure**
 
    - ${lineraProjectTreeTemplate}
 
-5. **State Management**
-
-   - Use \`RegisterView<T>\`, \`MapView<K, V>\`, \`VecView<T>\`, etc. in linera-views crate
-   - Learn linera-views and linera-sdk crates to know how to use them in your code
-
-6. **Async Traits and Context**
-
-   - Use \`#[async_trait]\` for \`Contract\` and \`Service\`
-   - Always access state through provided \`runtime\` objects
-
-7. **Cross-Chain Behavior**
-
-   - Use \`runtime.send_message(...)\`
-
-8. **Standard Library Restrictions**
-
-   - Do not use any lib which is not work in wasm32-unknown-unknown target
-
-9. **Code Output Rules**
-
-   - Never generate all files at once; follow step-by-step approach
-   - Output code in Markdown blocks only
-   - No extra commentary unless requested
-
-10. **Post-Deployment Handling**
-
-   - Always capture and preserve the \`ApplicationId\` from \`linera publish-and-create\`
-   - Indicate that this ID will be used in front-end and chain calls
-
-11. **Front-end Integration**
-
-   - All front-end code (e.g., React/Next.js/Vue) must interact with the Linera GraphQL API
-   - Use GraphQL queries to:
-     - Fetch application state (via service interface)
-     - Submit operations (via mutation)
-     - Monitor chain state and message delivery
-   - The GraphQL endpoint is usually exposed by the local node or the Linera service proxy
-   - You must structure queries to match the service response format defined in \`service.rs\`
-
-12. **Randomness Constraints**
+4. **Randomness Constraints**
 
    - Random number generation must be compatible with WASM environment.
    - Always add the following dependencies to \`Cargo.toml\`:
@@ -229,11 +196,20 @@ After user approves the plan, use the switch_mode tool to request that the user 
      \`\`\`rust
      getrandom::register_custom_getrandom!(custom_random);
      \`\`\`
-   
 
-YOU MUST RETURN FULL PATH OF THE SOURCE FILE: <project_name>/src/contract.rs is CORRECT, src/contract.rs is INCORRECT, <project_name>/Cargo.toml is CORRECT, Cargo.toml is INCORRECT.
-YOU MUST GENERATE THE CODE INCREMENTALLY, NOT ALL AT ONCE. EACH FILE MUST BE A COMPLETE, SELF-CONTAINED, AND COMPILABLE RUST MODULE. AFTER CREATING OR MODIFYING ANY FILE, YOU MUST COMPILE THE PROJECT TO VERIFY CORRECTNESS BEFORE MOVING TO THE NEXT STEP.
-YOU MUST KEEP CORRECT USAGE OF LINERA SDK AND PROTOCOL, INCLUDING ALL REQUIRED CRATES, MODULES, AND STRUCTURES. DO NOT DEVIATE FROM THE LINERA PROTOCOL OR SDK USAGE PATTERNS.
+5. **Linera Application Constraints**
+
+   - Using linera_sdk::views members to constraint members of state, for example RegisterView<u64>. If you don't know how to use it, you can refer to the linera-sdk and linera-views through docsrs-mcp.
+   - DON'T modify all #[derive], #[view] declarations
+   - DON'T modify all macro declarations
+   - DON'T add of delete exist types, you can only modify the type values
+   - DON'T modify exist structs, enums, or traits, you can only implement in the trait functions
+   - DON'T modify compilation configuration
+   - DON'T modify Cargo.toml structure, you can only add dependencies
+   - DON'T modify all code lines contains \`self.runtime.\`, that means, you must let Linera runtime work correctly
+   - There is a predefined state structure in state.rs, you must use it as the base state structure of the application. You can add fields to it, or implement additional functions.
+   - MUST check tool version before installing, and install only if not already installed.
+   - Project name, structure name, function name, variable name, etc. MUST start with letter
 `,
 	},
 	{
