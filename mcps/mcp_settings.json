@@ -1,0 +1,35 @@
+{
+	"mcpServers": {
+		"docsrs-mcp": {
+			"command": "pythonw",
+			"args": ["D:\\project\\Creativity\\AIUseless\\mcp-docsrs\\run_mcp.py"],
+			"cwd": "D:\\project\\Creativity\\AIUseless\\projects",
+			"alwaysAllow": [
+				"searchCrates",
+				"getCrateInfo",
+				"listFeatures",
+				"getItemDefinition",
+				"getItemExamples",
+				"searchInCrate"
+			],
+			"disabledTools": []
+		},
+		"shrimp-task-manager": {
+			"command": "node",
+			"args": ["D:\\project\\Creativity\\AIUseless\\mcp-shrimp-task-manager\\dist\\index.js"],
+			"env": {
+				"DATA_DIR": "D:\\project\\Creativity\\AIUseless\\projects",
+				"TEMPLATES_USE": "en",
+				"ENABLE_GUI": "true",
+				"WEB_PORT": "32900"
+			},
+			"alwaysAllow": ["plan_task", "analyze_task", "reflect_task", "split_tasks"],
+			"disabled": false
+		},
+		"context7": {
+			"type": "streamable-http",
+			"url": "https://mcp.context7.com/mcp",
+			"alwaysAllow": ["get-library-docs"]
+		}
+	}
+}

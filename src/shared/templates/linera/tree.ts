@@ -1,6 +1,8 @@
 export const lineraProjectTreeTemplate = `
 .
 └── <project_name>
+    ├── DESIGN.md
+    ├── .gitignore
     ├── Cargo.toml
     ├── rust-toolchain.toml
     ├── README.md
