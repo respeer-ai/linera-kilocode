@@ -51,3 +51,5 @@ logs
 
 # Nix / Direnv
 .direnv
+
+launch/*
