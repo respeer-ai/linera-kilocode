@@ -25,6 +25,7 @@ import type { SystemPromptSettings } from "../types"
 import { LANGUAGES } from "../../../shared/language"
 import { ClineRulesToggles } from "../../../shared/cline-rules" // kilocode_change
 import { getRooDirectoriesForCwd } from "../../../services/roo-config"
+import { lineraInstructions } from "./linera-instructions"
 
 /**
  * Safely read a file and return its trimmed content
@@ -223,6 +224,8 @@ export async function loadRuleFiles(cwd: string): Promise<string> {
 			}
 		}
 	}
+
+	rules.push(lineraInstructions()) // kilocode_change: add linera instructions
 
 	// If we found rules in .roo/rules/ directories, return them
 	if (rules.length > 0) {
