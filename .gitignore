@@ -62,3 +62,4 @@ deps/vscode/*
 
 # Qdrant
 qdrant_storage/
+launch/*

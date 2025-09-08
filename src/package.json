@@ -521,7 +521,8 @@
 					"default": [
 						"git log",
 						"git diff",
-						"git show"
+						"git show",
+						"cargo"
 					],
 					"description": "%commands.allowedCommands.description%"
 				},
