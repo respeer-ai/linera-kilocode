@@ -3,13 +3,14 @@ export const lineraInstructions = () => {
 		`
     # Rules from linera documentation:
     # Linera工具规则
+    - Linera SDK版本检查
+      - Linera SDK版本必须为0.15以上，不能使用旧版本的Linera SDK。可以通过\`linera --version\`获取版本信息。
+      - 如果检查的版本不一致，重新安装Linera工具，确保版本一致。
     - Linera工具安装
-      - cargo install --locked linera-storage-service@0.14.1
-      - cargo install --locked linera-service@0.14.1
+      - cargo install --locked linera-storage-service@0.15.0
+      - cargo install --locked linera-service@0.15.0
     - Scaffolding new Linera project
       - Always scaffold a new Linera project using the command: \`linera project new\`
-    - Linera SDK版本
-      - Linera SDK版本必须和应用框架中的版本一致，不能使用其他版本的Linera SDK。可以通过\`linera --version\`获取版本信息。
     - 运行钱包服务
       - 使用\`linera service --port 8080\`运行Linera钱包服务，端口号可以根据需要修改，但必须确保端口没有被占用。
     - Linera SDK documentation
@@ -57,13 +58,14 @@ export const lineraInstructions = () => {
     4. 修改函数实现，反复上述步骤直到测试用例全部通过，未通过单元测试的代码将被全部拒绝
     5. 重构代码，确保代码质量和可读性，重复代码、不能被人阅读的代码、层次错乱的代码将被拒绝
     6. 反复上述步骤确保重构后的测试用例仍然通过，未通过单元测试的代码将被全部拒绝
+    7. 当需要修改代码解决单元测试错误，你不应该随意修改哪些已经验证过的代码
     **特别注意**:
     - 每次**只允许**变更**一个**函数，不允许一次性变更多个函数。函数变更完成后，运行单元测试通过再继续下一步。一次性变更多个函数的代码将被拒绝。
     - 只要变更代码，无论是增加函数，删除函数，还是变更函数实现，修改结构体，修改定义声明等，都必须运行单元测试，确保所有单元测试通过。未通过单元测试的代码将被拒绝。
     - 修改任何代码之前**必须**编写单元测试用例，没有测试用例的任何代码将被拒绝。单元测试流程见TDD实践。由于全部单元测试耗时较长，你只需要运行变更部分的单元测试以及依赖变更部分的单元测试。
     - 每次变更完成必须运行Lint检查，确保代码符合Rust和前端的Lint规范。Lint检查必须通过，否则所有代码将被拒绝。Lint后的代码必须确保单元测试通过，否则所有代码将被拒绝。
     - 每个功能点完成之后，必须编写系统测试用例，测试用例必须覆盖功能点的所有逻辑分支，没有系统测试用例的任何代码将被拒绝。
-    不遵循上述TDD实践流程的所有代码将被拒绝。
+    你对规范的TDD开发流程有神经质般的执着，不能容忍任何不符合TDD规范的变更。每当你看到有人写了不止一个函数，才执行测试，你总是暴跳如雷。不遵循上述TDD实践流程的所有代码将被拒绝。
 
     # 严格遵循DDD实践
     所有设计和实现必须严格遵循DDD实践，步骤如下：

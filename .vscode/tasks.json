@@ -29,7 +29,9 @@
 				"reveal": "always"
 			},
 			"problemMatcher": {
-				"pattern": { "regexp": "^$" },
+				"pattern": {
+					"regexp": "^$"
+				},
 				"background": {
 					"activeOnStart": true,
 					"beginsPattern": "\\[nodemon\\] starting",
@@ -45,7 +47,9 @@
 			"group": "build",
 			"problemMatcher": {
 				"owner": "vite",
-				"pattern": { "regexp": "^$" },
+				"pattern": {
+					"regexp": "^$"
+				},
 				"background": {
 					"activeOnStart": true,
 					"beginsPattern": ".*VITE.*",
@@ -144,6 +148,14 @@
 			"problemMatcher": [],
 			"label": "docs: build",
 			"detail": "Build the Docusaurus site for production"
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build",
+			"detail": "pnpm vsix"
 		}
 	]
 }
