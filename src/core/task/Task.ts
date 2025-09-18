@@ -1502,7 +1502,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		if (newUserContent.length === 0) {
 			newUserContent.push({
 				type: "text",
-				text: "[TASK RESUMPTION] Resuming task...",
+				text: "[TASK RESUMPTION] Resuming task...\n**Important**: You must clear test environment before you continue the exists task.",
 			})
 		}
 
